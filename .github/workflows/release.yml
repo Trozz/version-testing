@@ -1,0 +1,19 @@
+name: Create a release version
+on:
+    workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    - name: Tag
+      uses: K-Phoen/semver-release-action@master
+      with:
+        release_branch: main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
