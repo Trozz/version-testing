@@ -3,15 +3,10 @@ on:
     workflow_dispatch:
 
 jobs:
-  release:
+  release_draft:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-
-    - name: Tag
-      uses: 'rui-costa/action-automatic-semver-releases@1.1.1'
+    - name: Release Draft
+      uses: crs-k/release-draft@v0.6.1
       with:
-        TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
