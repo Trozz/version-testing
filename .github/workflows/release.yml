@@ -12,8 +12,6 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Tag
-      uses: K-Phoen/semver-release-action@master
+      uses: 'rui-costa/action-automatic-semver-releases@1.1.1'
       with:
-        release_branch: main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TOKEN: '${{ secrets.GITHUB_TOKEN }}'
