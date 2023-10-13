@@ -23,6 +23,6 @@ jobs:
         if: ${{ github.event.inputs.test == 'f' }}
         run: echo false
       - name: "true-false"
-        if: ${{ github.event.inputs.test == 't' }} || ${{ github.event.inputs.test == 'f' }}
+        if: ${{ github.event.inputs.test == 't' }} && ${{ github.event.inputs.test == 'f' }}
         run: echo true-false
         
