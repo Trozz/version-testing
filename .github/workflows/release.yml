@@ -73,14 +73,14 @@ jobs:
 
       - name: Bump version and push tag | PATCH
         id: tag_version_patch
-        if: ${{ ! contains(github.event.pull_request.labels.*.name, 'MAJOR') }} && ${{ ! contains(github.event.pull_request.labels.*.name, 'MINOR') }}
+        if: ${{ ! contains(github.event.pull_request.labels.*.name, 'MAJOR') }} || ${{ ! contains(github.event.pull_request.labels.*.name, 'MINOR') }}
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: patch
 
       - name: Create a GitHub release | PATCH
-        if: ${{ ! contains(github.event.pull_request.labels.*.name, 'MAJOR') }} && ${{ ! contains(github.event.pull_request.labels.*.name, 'MINOR') }}
+        if: ${{ ! contains(github.event.pull_request.labels.*.name, 'MAJOR') }} || ${{ ! contains(github.event.pull_request.labels.*.name, 'MINOR') }}
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.tag_version_patch.outputs.new_tag }}
