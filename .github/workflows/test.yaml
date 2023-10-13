@@ -1,0 +1,28 @@
+name: test
+on:
+    workflow_dispatch:
+      inputs:
+        test:
+          type: choice
+          options:
+            - "true"
+            - "false"
+            - "other"
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: "true"
+        if: ${{ github.event.inputs.test == "true" }}
+        run: echo true
+      - name: "false"
+        if: ${{ github.event.inputs.test == "false" }}
+        run: echo false
+      - name: "true-false"
+        if: ${{ github.event.inputs.test != "true" }} || ${{ github.event.inputs.test != "true" }}
+        run: echo true-false
+        
