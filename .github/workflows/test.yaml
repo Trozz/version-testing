@@ -5,8 +5,8 @@ on:
         test:
           type: choice
           options:
-            - "true"
-            - "false"
+            - "t"
+            - "f"
             - "other"
 
 
@@ -17,12 +17,12 @@ jobs:
       contents: write
     steps:
       - name: "true"
-        if: ${{ github.event.inputs.test == "true" }}
+        if: ${{ github.event.inputs.test == "t" }}
         run: echo true
       - name: "false"
-        if: ${{ github.event.inputs.test == "false" }}
+        if: ${{ github.event.inputs.test == "f" }}
         run: echo false
       - name: "true-false"
-        if: ${{ github.event.inputs.test != "true" }} || ${{ github.event.inputs.test != "true" }}
+        if: ${{ github.event.inputs.test == "t" }} || ${{ github.event.inputs.test == "f" }}
         run: echo true-false
         
