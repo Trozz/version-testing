@@ -1,16 +1,11 @@
-name: Create a release version
+name: Create a release
 on:
     workflow_dispatch:
         inputs:
-            version_increment:
-                description: 'Version increment (major, minor, patch)'
-                type: choice
-                required: true
-                default: 'patch'
-                options:
-                    - major
-                    - minor
-                    - patch
+    pull_request:
+        types: [closed]
+        branches:
+            - main
 
 jobs:
   release:
@@ -21,29 +16,74 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Bump version and push tag
-        id: tag_version
+      - name: Fail if there is a MAJOR and MINOR label
+        if: contains(github.event.pull_request.labels.*.name, 'MAJOR') && contains(github.event.pull_request.labels.*.name, 'MINOR')
+        run: exit 1
+
+##########################################################
+#                                                        #
+#               Catch PRs with Major label               #
+#                                                        #
+##########################################################
+
+      - name: Bump version and push tag | MAJOR
+        id: tag_version_major
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'MAJOR')
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: ${{ github.event.inputs.version_increment }}
-          
-      - name: Create a GitHub release
+          default_bump: major
+
+      - name: Create a GitHub release | MAJOR
+        if: contains(github.event.pull_request.labels.*.name, 'MAJOR')
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          tag: ${{ steps.tag_version_major.outputs.new_tag }}
+          name: Release ${{ steps.tag_version_major.outputs.new_tag }}
+          body: ${{ steps.tag_version_major.outputs.changelog }}
+
+##########################################################
+#                                                        #
+#               Catch PRs with Minor label               #
+#                                                        #
+##########################################################
+
+      - name: Bump version and push tag | MINOR
+        id: tag_version_minor
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'MINOR')
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: minor
+
+      - name: Create a GitHub release | MINOR
+        if: contains(github.event.pull_request.labels.*.name, 'MINOR')
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version_minor.outputs.new_tag }}
+          name: Release ${{ steps.tag_version_minor.outputs.new_tag }}
+          body: ${{ steps.tag_version_minor.outputs.changelog }}
 
 
+###################################################################
+#                                                                 #
+# If PR does not contain major or minor labels then patch release #
+#                                                                 #
+###################################################################
 
-    #   - name: "Increment Version"
-    #     id: version
-    #     run: |
-    #       current_version=$(git describe --tags --abbrev=0)
-    #       curl https://raw.githubusercontent.com/fsaintjacques/semver-tool/master/src/semver -o semver
-    #       new_version=$(semver bump ${{ github.event.inputs.version_increment }} $current_version)
-    #       echo "OLD_GITVER=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-    #       echo "NEW_GITVER=$new_version" >> $GITHUB_OUTPUT
+      - name: Bump version and push tag | PATCH
+        id: tag_version_patch
+        if: ! contains(github.event.pull_request.labels.*.name, 'MAJOR') && ! contains(github.event.pull_request.labels.*.name, 'MINOR')
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
 
+      - name: Create a GitHub release | PATCH
+        if: ! contains(github.event.pull_request.labels.*.name, 'MAJOR') && ! contains(github.event.pull_request.labels.*.name, 'MINOR')
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version_patch.outputs.new_tag }}
+          name: Release ${{ steps.tag_version_patch.outputs.new_tag }}
+          body: ${{ steps.tag_version_patch.outputs.changelog }}
 
